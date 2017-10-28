@@ -1,0 +1,2 @@
+cyglfw3
+pyopengl==3.1.1a1
