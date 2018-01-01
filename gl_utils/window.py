@@ -90,6 +90,7 @@ class Window(object):
 
 
     def close(self):
+        glfw.DestroyWindow(self._window);
         glfw.Terminate()
 
 

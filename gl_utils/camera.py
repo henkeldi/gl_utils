@@ -82,6 +82,7 @@ class Camera(object):
         self.__T_proj_world[:] = np.dot(self.__T_proj_view, self.__T_view_world)
         self.dirty = True
 
+
     def projection(self, fov, aspect, near, far):
         diff = near - far
         A = np.tan(fov/2.0)
@@ -245,6 +246,20 @@ class Camera(object):
         d_c = 1.0/cols
         viewport = (d_c*col, d_r*row, d_c, d_r)
         self.set_viewport(*viewport)
+
+    def transform(self, point, source_frame, target_frame):
+        if source_frame == 'screen':
+            if target_frame == 'world':
+                T_screen_ncd = np.array([
+                    [2./self._w, 0., 0., -1.],
+                    [0, -2./self._h, 0., 1.],
+                    [0., 0., 0., 0.],
+                    [0., 0., 0., 1.]
+                ])
+                T_world_proj = np.linalg.inv(self.__T_proj_world)
+                new_point = T_world_proj.dot(T_screen_ncd).dot(np.array([point[0], point[1], 0., 1.]))
+                
+                return new_point
 
     @property
     def T_world_view(self):

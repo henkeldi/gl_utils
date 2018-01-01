@@ -77,7 +77,7 @@ class Texture1D(Texture):
         data_format, data_type, pixels):
         
         glTextureSubImage1D(
-            self.__id,
+            self._id,
             level,
             xoffset, width,
             data_format, data_type, pixels
@@ -91,7 +91,7 @@ class Texture3D(Texture):
     def __init__(self, target, levels, internalformat, width, height, depth):
         self._id = np.empty(1, dtype=np.uint32)
         glCreateTextures(target, len(self._id), self._id)
-        glTextureStorage3D(self.__id, levels, internalformat, width, height, depth)
+        glTextureStorage3D(self._id, levels, internalformat, width, height, depth)
 
 
     def sub_image(self, level, 
@@ -99,7 +99,7 @@ class Texture3D(Texture):
         width, height, depth,
         data_format, data_type, pixels):
         
-        glTextureSubImage3D(self.__id, level, 
+        glTextureSubImage3D(self._id, level, 
             xoffset, yoffset, zoffset,
             width, height, depth, 
             data_format, data_type, pixels

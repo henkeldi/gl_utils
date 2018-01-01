@@ -40,7 +40,7 @@ class Program(object):
 
         glLinkProgram(self.__program)
         if not glGetProgramiv(self.__program, GL_LINK_STATUS):
-            log.error(glGetProgramInfoLog(self.__program))
+            log.error('\033[31m'+glGetProgramInfoLog(self.__program)+'\033[39m')
             raise RuntimeError('Shader linking failed')
         else:
             log.debug('Shader linked.')
@@ -59,8 +59,8 @@ class Program(object):
             glShaderSource(shader, code)
         glCompileShader(shader)
         if not glGetShaderiv(shader, GL_COMPILE_STATUS):
-            log.error(glGetShaderInfoLog(shader))
-            raise RuntimeError('[{}]: Shader compilation failed!'.format(path) )
+            log.error('\033[31m'+glGetShaderInfoLog(shader)+'\033[39m')
+            raise RuntimeError('[\033[32m{}\033[39m]: Shader compilation failed!'.format(path) )
         else:
             log.debug('Shader compiled (%s).', path)
         return shader
@@ -77,3 +77,30 @@ class Program(object):
     @property
     def id(self):
         return self.__program
+
+
+class InteractiveProgram(Program):
+
+    def __init__(self, *shader_paths):
+        self._shader_paths = shader_paths
+        self.init()
+        super(InteractiveProgram, self).__init__(*shader_paths)
+
+    def update(self):
+        if any([os.stat(p)[8] != t for p, t in zip(self._full_shader_paths, self._shader_last_modified_timestamp)]):
+            self.init()
+            try:
+                self.compile_and_use()
+                self.delete()
+            except RuntimeError as e:
+                pass
+            print 'Recompiled shader!'
+
+    def init(self):
+        self._full_shader_paths = []
+        self._shader_last_modified_timestamp = []
+        for path in self._shader_paths:
+            if Program.shader_folder != None:
+                path = os.path.join(Program.shader_folder, path)
+            self._shader_last_modified_timestamp.append( os.stat(path)[8] )
+            self._full_shader_paths.append(path)       

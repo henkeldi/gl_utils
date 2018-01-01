@@ -36,5 +36,5 @@ def build_textures(paths):
 def build_texture_buffer(*textures):
 	from buffer import Buffer
 	handles = [t.make_resident() for t in textures]
-	return Buffer( np.array(handles, dtype=np.uint32) )
+	return Buffer( np.array(handles, dtype=np.uint64) )
 
